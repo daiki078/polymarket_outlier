@@ -93,12 +93,3 @@ python3 collector.py --balance --markets 360          # even out sector coverage
 ## Requirements
 
 Python 3.8+ standard library only — no third-party packages.
-
-## Caveats
-
-- Only fills in **fully-resolved** markets are scored; short windows (1h/6h) only
-  populate as short-lived markets (sports, hourly crypto) resolve.
-- Markets can belong to **multiple sectors**, so sector fill-counts overlap and sum
-  to more than the `all` total.
-- Wallets are **not deduplicated** — one actor can hold many addresses.
-- Resolved markets are backward-looking: this finds who *has been* right.
