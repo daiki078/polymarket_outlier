@@ -1,0 +1,2 @@
+# No third-party dependencies — this project uses the Python 3.8+ standard library
+# only (sqlite3, http.server, urllib, json, threading). Nothing to install.

@@ -1,0 +1,18 @@
+# local database (regenerable, large) + WAL sidecars
+pmedge.db
+pmedge.db-wal
+pmedge.db-shm
+
+# logs
+*.log
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS / editors
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json

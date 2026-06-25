@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polymarket Edge — wallet leaderboard</title>
+<style>
+  :root{
+    --bg:#0b0e17; --surface:#141826; --surface2:#1b2030; --border:#262c3d;
+    --text:#eef1f7; --muted:#8a91a6; --muted2:#5d6478;
+    --blue:#2b6fff; --green:#27c281; --red:#f0483e; --amber:#f5b54a;
+    --shadow:0 1px 0 rgba(255,255,255,.02), 0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:6px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:11px}
+  .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--blue),#1b4fd6);
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  h1{font-size:18px;margin:0;font-weight:700;letter-spacing:-.2px}
+  .sub{color:var(--muted);font-size:12.5px;margin-top:1px}
+  .pills{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{background:var(--surface);border:1px solid var(--border);border-radius:999px;
+    padding:6px 12px;font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+  .pill b{color:var(--text);font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0 14px}
+  .seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px}
+  .seg button{background:transparent;border:0;color:var(--muted);padding:7px 13px;border-radius:7px;
+    font-size:13px;font-weight:600;cursor:pointer;transition:.12s}
+  .seg button:hover{color:var(--text)}
+  .seg button.active{background:var(--blue);color:#fff}
+  .ctl{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12.5px}
+  .ctl input{width:62px;background:var(--surface);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:7px 9px;font-size:13px}
+  .btn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:9px;
+    padding:8px 13px;font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover{border-color:#36405a}
+  .spacer{flex:1}
+  .refresh{color:var(--muted2);font-size:12px}
+  .sectors{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+  .chip{background:var(--surface);border:1px solid var(--border);border-radius:999px;
+    padding:7px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
+    text-transform:capitalize;transition:.12s;display:flex;gap:7px;align-items:center}
+  .chip:hover{color:var(--text);border-color:#36405a}
+  .chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
+  .chip .cnt{font-size:11px;font-weight:600;opacity:.7;font-variant-numeric:tabular-nums}
+  .chip.empty{opacity:.4;cursor:not-allowed}
+  .chip.empty:hover{color:var(--muted);border-color:var(--border)}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse}
+  thead th{position:sticky;top:0;background:var(--surface2);color:var(--muted);text-align:right;
+    font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:13px 16px;
+    border-bottom:1px solid var(--border)}
+  thead th.l{text-align:left}
+  tbody td{padding:13px 16px;border-bottom:1px solid rgba(38,44,61,.55);text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover{background:rgba(43,111,255,.05)}
+  td.l{text-align:left}
+  .rank{color:var(--muted2);font-weight:700;width:46px}
+  .rank.top{color:var(--amber)}
+  .addr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+  .addr:hover{color:var(--blue)}
+  .ext{color:var(--muted2);font-size:11px;margin-left:6px}
+  .t{font-weight:800;font-size:15px}
+  .pos{color:var(--green)} .neg{color:var(--red)} .mut{color:var(--muted)}
+  .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-right:8px;min-width:2px}
+  .empty{padding:46px;text-align:center;color:var(--muted)}
+  .tip{cursor:help;border-bottom:1px dotted var(--muted2)}
+  .foot{color:var(--muted2);font-size:11.5px;margin-top:14px;line-height:1.6}
+  @media(max-width:720px){.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">Σ</div>
+      <div>
+        <h1>Polymarket Edge</h1>
+        <div class="sub">Wallets ranked by <span class="tip" title="t = mean(edge)·√n / std(edge). Edge per trade = outcome − price (sell-normalized). The t-stat rewards consistent edge over many trades and discounts small, lucky samples.">edge t-statistic</span></div>
+      </div>
+    </div>
+    <div class="pills" id="pills">
+      <div class="pill"><span class="dot"></span><b id="p-status">live</b></div>
+      <div class="pill"><b id="p-trades">—</b> fills</div>
+      <div class="pill"><b id="p-scored">—</b> scored</div>
+      <div class="pill"><b id="p-wallets">—</b> wallets</div>
+      <div class="pill"><b id="p-markets">—</b> markets resolved</div>
+      <div class="pill">updated <b id="p-ingest">—</b></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="seg" id="windows"></div>
+    <div class="ctl">min trades
+      <input id="min" type="number" min="1" value="10">
+    </div>
+    <div class="spacer"></div>
+    <span class="refresh" id="countdown"></span>
+    <button class="btn" id="refresh">↻ Refresh</button>
+  </div>
+
+  <div class="sectors" id="sectors"></div>
+
+  <div class="card">
+    <table>
+      <thead><tr>
+        <th class="l">#</th>
+        <th class="l">Trader</th>
+        <th>t&#8209;stat</th>
+        <th>Edge / trade</th>
+        <th class="hide-sm">Hit&nbsp;rate</th>
+        <th>Trades</th>
+        <th class="hide-sm">Realized&nbsp;PnL</th>
+        <th class="hide-sm">Volume</th>
+      </tr></thead>
+      <tbody id="rows"><tr><td class="empty" colspan="8">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="foot">
+    <b>Edge</b> = mean(outcome − price) per trade; positive = systematically bought the winning side below fair value (alpha).
+    <b>t&#8209;stat</b> ranks by how reliable that edge is given sample size — it replaces eyeballing the trade count.
+    Only fills in fully-resolved markets are scored (edge needs a settled outcome). The window selects bets whose market <b>resolved</b> within that lookback — so 1h/24h show who's hot on recently-settled markets, while 1y/all show long-run skill.
+    Wallets are not deduplicated and resolved markets are backward-looking.
+  </div>
+</div>
+
+<script>
+const WINDOWS=["1h","6h","24h","7d","30d","1y","all"];
+const SECTORS=["all","politics","sports","crypto","finance","economy","geopolitics","tech","culture","weather"];
+const REFRESH_MS=15*60*1000;
+let win=localStorage.getItem("win")||"24h";
+let sector=localStorage.getItem("sector")||"all";
+let timer=null, nextAt=0;
+
+function short(a){return a.slice(0,6)+"…"+a.slice(-4);}
+function money(x){const s=x<0?"-":"";x=Math.abs(x);
+  if(x>=1e6)return s+"$"+(x/1e6).toFixed(2)+"M";
+  if(x>=1e3)return s+"$"+(x/1e3).toFixed(1)+"k";return s+"$"+x.toFixed(0);}
+function ago(ts){if(!ts)return"—";const s=Math.floor(Date.now()/1000)-ts;
+  if(s<60)return s+"s ago";if(s<3600)return Math.floor(s/60)+"m ago";
+  if(s<86400)return Math.floor(s/3600)+"h ago";return Math.floor(s/86400)+"d ago";}
+function cls(x){return x>0?"pos":x<0?"neg":"mut";}
+function sign(x,d=3){return (x>0?"+":"")+x.toFixed(d);}
+
+function buildWindows(){
+  const seg=document.getElementById("windows");
+  seg.innerHTML="";
+  WINDOWS.forEach(w=>{
+    const b=document.createElement("button");
+    b.textContent=w; b.className=w===win?"active":"";
+    b.onclick=()=>{win=w;localStorage.setItem("win",w);buildWindows();loadSectors();load();};
+    seg.appendChild(b);
+  });
+}
+
+async function loadSectors(){
+  let counts={};
+  try{counts=await (await fetch(`/api/sectors?window=${win}`)).json();}catch(e){}
+  const box=document.getElementById("sectors");
+  box.innerHTML="";
+  SECTORS.forEach(s=>{
+    const c=counts[s]||0;
+    const el=document.createElement("div");
+    const empty=s!=="all"&&c===0;
+    el.className="chip"+(s===sector?" active":"")+(empty?" empty":"");
+    el.innerHTML=`${s}${s!=="all"?`<span class="cnt">${c.toLocaleString()}</span>`:""}`;
+    if(!empty)el.onclick=()=>{sector=s;localStorage.setItem("sector",s);buildSectorsActive();load();};
+    box.appendChild(el);
+  });
+}
+function buildSectorsActive(){
+  document.querySelectorAll("#sectors .chip").forEach((el,i)=>{
+    el.classList.toggle("active",SECTORS[i]===sector);
+  });
+}
+
+async function loadStats(){
+  try{const s=await (await fetch("/api/stats")).json();
+    document.getElementById("p-trades").textContent=s.trades.toLocaleString();
+    document.getElementById("p-scored").textContent=s.scored.toLocaleString();
+    document.getElementById("p-wallets").textContent=s.wallets.toLocaleString();
+    document.getElementById("p-markets").textContent=s.markets_resolved.toLocaleString();
+    document.getElementById("p-ingest").textContent=ago(parseInt(s.last_ingest)||s.newest_ts);
+  }catch(e){}
+}
+
+async function load(){
+  const min=Math.max(1,parseInt(document.getElementById("min").value)||10);
+  const tbody=document.getElementById("rows");
+  try{
+    const r=await (await fetch(`/api/leaderboard?window=${win}&sector=${sector}&min_trades=${min}&limit=200`)).json();
+    const rows=r.rows;
+    if(!rows.length){tbody.innerHTML=`<tr><td class="empty" colspan="8">No ${sector==="all"?"":sector+" "}wallets with ≥${min} scored trades in this window yet — collector is still gathering data.</td></tr>`;}
+    else{
+      const maxT=Math.max(...rows.map(x=>Math.abs(x.tstat)),1);
+      tbody.innerHTML=rows.map((x,i)=>{
+        const bw=Math.round(Math.abs(x.tstat)/maxT*60);
+        const bc=x.tstat>=0?"var(--green)":"var(--red)";
+        return `<tr>
+          <td class="l rank ${i<3?'top':''}">${i+1}</td>
+          <td class="l"><a class="addr" href="https://polymarket.com/profile/${x.wallet}" target="_blank" rel="noopener">${short(x.wallet)}<span class="ext">↗</span></a></td>
+          <td><span class="bar" style="width:${bw}px;background:${bc}"></span><span class="t ${cls(x.tstat)}">${sign(x.tstat,2)}</span></td>
+          <td class="${cls(x.edge)}">${sign(x.edge,3)}</td>
+          <td class="hide-sm">${(x.hit_rate*100).toFixed(0)}%</td>
+          <td>${x.n.toLocaleString()}</td>
+          <td class="hide-sm ${cls(x.pnl)}">${money(x.pnl)}</td>
+          <td class="hide-sm mut">${money(x.volume)}</td>
+        </tr>`;}).join("");
+    }
+  }catch(e){tbody.innerHTML=`<tr><td class="empty" colspan="8">Error loading: ${e}</td></tr>`;}
+  loadStats();
+  nextAt=Date.now()+REFRESH_MS;
+}
+
+function tick(){
+  const left=Math.max(0,nextAt-Date.now());
+  const m=Math.floor(left/60000),s=Math.floor(left%60000/1000);
+  document.getElementById("countdown").textContent=`auto-refresh in ${m}:${String(s).padStart(2,'0')}`;
+  if(left<=0)load();
+}
+
+document.getElementById("refresh").onclick=load;
+document.getElementById("min").onchange=load;
+buildWindows(); loadSectors(); load();
+setInterval(tick,1000);
+</script>
+</body>
+</html>
