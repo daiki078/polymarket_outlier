@@ -21,19 +21,25 @@ and lets you slice the leaderboard by:
 ## The metric: edge t-statistic
 
 For fill $i$, let $o_i$ be the outcome index it traded, $w$ the market's winning outcome index, and $\pi_i \in [0,1]$ the executed price. We put BUYs and SELLs on a common long axis (a SELL of an outcome at price $\pi$ is a long of the complement at $1-\pi$), giving a normalized price $p_i$ and win indicator $y_i$:
+
 $$
 p_i = \begin{cases} \pi_i & \text{if BUY} \\[2pt] 1-\pi_i & \text{if SELL} \end{cases}
 \qquad\qquad
 y_i = \begin{cases} \mathbf{1}[\,o_i = w\,] & \text{if BUY} \\[2pt] \mathbf{1}[\,o_i \neq w\,] & \text{if SELL} \end{cases}
 $$
+
 where $\mathbf{1}[\cdot]\in\{0,1\}$ indicates whether the held side won. The **edge** is
 the realized return per \$1 share,
+
 $$e_i = y_i - p_i \in [-1, 1].$$
+
 A wallet with $n \ge 2$ scored fills is ranked by the **t-statistic** of its mean edge
 against the null hypothesis of no skill, $\mathbb{E}[e] = 0$
+
 $$t = \frac{\bar{e}\,\sqrt{n}}{\max(s_e,\,\varepsilon)}, \qquad
 \bar{e} = \frac{1}{n}\sum_{i=1}^{n} e_i, \qquad
 s_e = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(e_i-\bar{e}\right)^2},$$
+
 where we avoid zero-variance wallets by setting $\varepsilon = 0.05$ in practice. 
 
 - **$\bar{e}$ (mean edge)** — alpha per trade. Positive = systematically took the
