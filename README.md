@@ -23,17 +23,16 @@ and lets you slice the leaderboard by:
 For fill $i$, let $o_i$ be the outcome index it traded, $w$ the market's winning outcome index, and $\pi_i \in [0,1]$ the executed price. We put BUYs and SELLs on a common long axis (a SELL of an outcome at price $\pi$ is a long of the complement at $1-\pi$), giving a normalized price $p_i$ and win indicator $y_i$:
 
 $$
-p_i = \begin{cases} \pi_i & \text{if BUY} \\[2pt] 1-\pi_i & \text{if SELL} \end{cases}
+p_i = \begin{cases} \pi_i & \text{if BUY} \\ 1-\pi_i & \text{if SELL} \end{cases}
 \qquad\qquad
-y_i = \begin{cases} \mathbf{1}[\,o_i = w\,] & \text{if BUY} \\[2pt] \mathbf{1}[\,o_i \neq w\,] & \text{if SELL} \end{cases}
+y_i = \begin{cases} \mathbf{1}{,o_i = w} & \text{if BUY} \\ \mathbf{1}{o_i \neq w} & \text{if SELL} \end{cases}
 $$
 
-where $\mathbf{1}[\cdot]\in\{0,1\}$ indicates whether the held side won. The **edge** is
-the realized return per \$1 share,
+where $\mathbf{1}$ is the indicator function. The **edge** is the realized return per \$1 share,
 
 $$e_i = y_i - p_i \in [-1, 1].$$
 
-A wallet with $n \ge 2$ scored fills is ranked by the **t-statistic** of its mean edge
+A wallet with $n \ge 2$ fills is ranked by the **t-statistic** of its mean edge
 against the null hypothesis of no skill, $\mathbb{E}[e] = 0$
 
 $$t = \frac{\bar{e}\,\sqrt{n}}{\max(s_e,\,\varepsilon)}, \qquad
